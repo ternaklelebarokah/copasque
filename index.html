@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LinkVault - Simpan Judul & Link</title>
+  <meta name="description" content="Simpan dan kelola judul serta link dengan mudah." />
+
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Supabase JS Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- Google Font - Monospace + Serif blend like Saweria -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;600;700;800&family=Poppins:wght@700;800&display=swap" rel="stylesheet" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            mono: ['"Space Mono"', 'monospace'],
+            display: ['"Syne"', 'sans-serif'],
+          },
+          colors: {
+            saweria: {
+              yellow: '#F5C842',
+              teal:   '#3ECFBF',
+              red:    '#F25C54',
+              bg:     '#FAFAF8',
+              card:   '#FFFFFF',
+              border: '#111111',
+            },
+          },
+          boxShadow: {
+            brutal: '4px 4px 0px #111111',
+            'brutal-sm': '3px 3px 0px #111111',
+            'brutal-lg': '6px 6px 0px #111111',
+            'brutal-yellow': '4px 4px 0px #F5C842',
+            'brutal-teal': '4px 4px 0px #3ECFBF',
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    body {
+      font-family: 'Space Mono', monospace;
+      background-color: #FAFAF8;
+      /* subtle dot pattern like saweria */
+      background-image: radial-gradient(#ddd 1px, transparent 1px);
+      background-size: 22px 22px;
+    }
+    /* Loading spinner */
+    .spinner {
+      border: 3px solid rgba(17, 17, 17, 0.1);
+      border-top: 3px solid #3ECFBF;
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    /* Toast */
+    @keyframes slideUp {
+      from { transform: translateY(100%); opacity: 0; }
+      to   { transform: translateY(0);    opacity: 1; }
+    }
+    .toast-enter { animation: slideUp 0.3s ease forwards; }
+    /* Modal */
+    @keyframes scaleIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+    .modal-overlay { animation: fadeIn 0.2s ease forwards; }
+    @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+    .modal-content  { animation: scaleIn 0.2s ease forwards; }
+    /* Brutal button press */
+    .btn-brutal {
+      transition: transform 0.1s ease, box-shadow 0.1s ease;
+    }
+    .btn-brutal:active {
+      transform: translate(4px, 4px);
+      box-shadow: 0px 0px 0px #111111 !important;
+    }
+    /* Input focus */
+    input:focus, select:focus {
+      outline: none;
+    }
+    /* Tag pill */
+    .tag-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 10px;
+      border: 1.5px solid #111;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      background: #fff;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen flex flex-col text-saweria-border">
+
+  <!-- ============ HEADER ============ -->
+  <header class="bg-white border-b-2 border-saweria-border sticky top-0 z-40">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+
+      <!-- Logo -->
+      <a href="#" class="flex items-center gap-2 group">
+        <div class="w-9 h-9 rounded-lg border-2 border-saweria-border bg-saweria-yellow flex items-center justify-center shadow-brutal-sm group-hover:translate-x-[1px] group-hover:translate-y-[1px] group-hover:shadow-none transition-all">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 5v14l7-4 7 4V5" />
+          </svg>
+        </div>
+        <span class="text-xl font-display font-800 tracking-tight">linkvault</span>
+      </a>
+
+      <!-- Right -->
+      <div class="flex items-center gap-3">
+        <span id="userEmail" class="hidden sm:block text-xs text-gray-400 font-mono truncate max-w-[160px]"></span>
+        <button
+          onclick="logout()"
+          class="btn-brutal flex items-center gap-1.5 px-3 py-2 bg-white border-2 border-saweria-border rounded-xl text-xs font-bold shadow-brutal-sm"
+          title="Keluar"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+          Keluar
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============ HERO ============ -->
+  <section class="max-w-4xl w-full mx-auto px-4 sm:px-6 pt-12 pb-6 text-center">
+    <p class="text-xs font-mono text-saweria-teal font-bold tracking-widest uppercase mb-3">— simpan semua link kamu —</p>
+    <h1 class="text-4xl sm:text-5xl font-extrabold leading-tight mb-4" style="font-family: 'Poppins', sans-serif;">
+      Tempat nyimpan judul<br />
+      <span class="relative inline-block">
+        <span class="relative z-10">&amp; link favoritmu!</span>
+        <span class="absolute bottom-1 left-0 w-full h-3 bg-saweria-yellow -z-0 opacity-70"></span>
+      </span>
+    </h1>
+    <p class="text-gray-500 font-mono text-sm max-w-md mx-auto leading-relaxed">
+      Kumpulkan, edit, dan akses semua link pentingmu dengan rapi. Tersimpan langsung ke Supabase.
+    </p>
+  </section>
+
+  <!-- ============ MAIN ============ -->
+  <main class="flex-1 max-w-4xl w-full mx-auto px-4 sm:px-6 pb-12">
+
+    <!-- ============ FORM CARD ============ -->
+    <section class="mb-10">
+      <div class="bg-saweria-card border-2 border-saweria-border rounded-2xl p-6 sm:p-8 shadow-brutal-lg">
+        <!-- Card header label -->
+        <div class="inline-flex items-center gap-2 bg-saweria-teal border-2 border-saweria-border rounded-full px-4 py-1 text-xs font-bold mb-5 shadow-brutal-sm">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+          </svg>
+          tambah link baru
+        </div>
+
+        <form id="linkForm" class="space-y-4">
+          <div>
+            <label for="titleInput" class="block text-xs font-bold mb-1.5 uppercase tracking-wider">Judul</label>
+            <input
+              type="text"
+              id="titleInput"
+              required
+              maxlength="100"
+              placeholder="Contoh: Dokumentasi Tailwind CSS"
+              class="w-full bg-saweria-bg border-2 border-saweria-border rounded-xl px-4 py-3 text-sm font-mono placeholder-gray-400 focus:border-saweria-teal focus:ring-2 focus:ring-saweria-teal/20 shadow-brutal-sm transition-shadow"
+            />
+          </div>
+
+          <div>
+            <label for="linkInput" class="block text-xs font-bold mb-1.5 uppercase tracking-wider">Link (URL)</label>
+            <input
+              type="url"
+              id="linkInput"
+              required
+              placeholder="https://example.com"
+              class="w-full bg-saweria-bg border-2 border-saweria-border rounded-xl px-4 py-3 text-sm font-mono placeholder-gray-400 focus:border-saweria-teal focus:ring-2 focus:ring-saweria-teal/20 shadow-brutal-sm transition-shadow"
+            />
+          </div>
+
+          <div>
+            <label for="categoryInput" class="block text-xs font-bold mb-1.5 uppercase tracking-wider">
+              Kategori <span class="text-gray-400 normal-case tracking-normal font-normal">(opsional)</span>
+            </label>
+            <input
+              type="text"
+              id="categoryInput"
+              maxlength="30"
+              placeholder="Contoh: Dokumentasi, Tutorial, Tools"
+              list="categoryList"
+              class="w-full bg-saweria-bg border-2 border-saweria-border rounded-xl px-4 py-3 text-sm font-mono placeholder-gray-400 focus:border-saweria-teal focus:ring-2 focus:ring-saweria-teal/20 shadow-brutal-sm transition-shadow"
+            />
+            <datalist id="categoryList"></datalist>
+          </div>
+
+          <div class="pt-1">
+            <button
+              type="submit"
+              id="submitBtn"
+              class="btn-brutal w-full sm:w-auto px-8 py-3 bg-saweria-yellow border-2 border-saweria-border rounded-xl font-bold text-sm shadow-brutal flex items-center gap-2 justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <svg id="btnIcon" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+              <span id="btnText">Simpan Link</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- ============ LIST SECTION ============ -->
+    <section>
+      <!-- Toolbar -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
+        <div class="flex items-center gap-3">
+          <h2 class="text-base font-display font-bold flex items-center gap-2">
+            Link Tersimpan
+          </h2>
+          <span id="countBadge" class="inline-flex items-center justify-center w-7 h-7 rounded-full border-2 border-saweria-border bg-saweria-yellow text-xs font-bold shadow-brutal-sm">0</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <!-- Category Filter -->
+          <select
+            id="categoryFilter"
+            class="bg-white border-2 border-saweria-border rounded-xl px-3 py-2 text-xs font-bold font-mono focus:border-saweria-teal focus:ring-2 focus:ring-saweria-teal/20 shadow-brutal-sm cursor-pointer transition"
+          >
+            <option value="">Semua Kategori</option>
+          </select>
+          <!-- Search -->
+          <div class="relative">
+            <input
+              type="text"
+              id="searchInput"
+              placeholder="Cari judul..."
+              class="w-36 sm:w-52 bg-white border-2 border-saweria-border rounded-xl pl-9 pr-4 py-2 text-xs font-mono placeholder-gray-400 focus:border-saweria-teal focus:ring-2 focus:ring-saweria-teal/20 shadow-brutal-sm transition"
+            />
+            <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-3 top-2.5 w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      <div id="loadingState" class="flex flex-col items-center justify-center py-16">
+        <div class="spinner mb-4"></div>
+        <p class="text-gray-400 text-sm font-mono">Memuat data...</p>
+      </div>
+
+      <!-- Empty State -->
+      <div id="emptyState" class="hidden">
+        <div class="bg-white border-2 border-saweria-border rounded-2xl p-10 text-center shadow-brutal">
+          <div class="text-5xl mb-4">📭</div>
+          <p class="font-display font-bold text-lg">Belum ada link tersimpan</p>
+          <p class="text-gray-400 font-mono text-sm mt-1">Tambahkan link pertamamu di form atas.</p>
+        </div>
+      </div>
+
+      <!-- Link Grid -->
+      <div id="linkGrid" class="grid sm:grid-cols-2 gap-4"></div>
+    </section>
+  </main>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="border-t-2 border-saweria-border bg-white">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-2">
+      <p class="font-mono text-xs text-gray-400">linkvault &copy; 2026</p>
+      <p class="font-mono text-xs text-gray-400">dibuat dengan HTML · Tailwind · Supabase</p>
+    </div>
+  </footer>
+
+  <!-- ============ EDIT MODAL ============ -->
+  <div id="editModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="modal-overlay absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="closeEditModal()"></div>
+    <div class="modal-content relative bg-white border-2 border-saweria-border rounded-2xl p-6 sm:p-8 w-full max-w-md shadow-brutal-lg">
+      <div class="flex items-center justify-between mb-5">
+        <div class="inline-flex items-center gap-2 bg-saweria-yellow border-2 border-saweria-border rounded-full px-4 py-1 text-xs font-bold shadow-brutal-sm">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+          </svg>
+          edit link
+        </div>
+        <button onclick="closeEditModal()" class="btn-brutal w-8 h-8 rounded-lg border-2 border-saweria-border bg-saweria-bg flex items-center justify-center shadow-brutal-sm">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <form id="editForm" class="space-y-4">
+        <input type="hidden" id="editId" />
+        <div>
+          <label for="editTitleInput" class="block text-xs font-bold mb-1.5 uppercase tracking-wider">Judul</label>
+          <input type="text" id="editTitleInput" required maxlength="100"
+            class="w-full bg-saweria-bg border-2 border-saweria-border rounded-xl px-4 py-3 text-sm font-mono focus:border-saweria-teal focus:ring-2 focus:ring-saweria-teal/20 shadow-brutal-sm transition" />
+        </div>
+        <div>
+          <label for="editLinkInput" class="block text-xs font-bold mb-1.5 uppercase tracking-wider">Link (URL)</label>
+          <input type="url" id="editLinkInput" required
+            class="w-full bg-saweria-bg border-2 border-saweria-border rounded-xl px-4 py-3 text-sm font-mono focus:border-saweria-teal focus:ring-2 focus:ring-saweria-teal/20 shadow-brutal-sm transition" />
+        </div>
+        <div>
+          <label for="editCategoryInput" class="block text-xs font-bold mb-1.5 uppercase tracking-wider">
+            Kategori <span class="text-gray-400 normal-case tracking-normal font-normal">(opsional)</span>
+          </label>
+          <input type="text" id="editCategoryInput" maxlength="30" list="categoryList"
+            class="w-full bg-saweria-bg border-2 border-saweria-border rounded-xl px-4 py-3 text-sm font-mono focus:border-saweria-teal focus:ring-2 focus:ring-saweria-teal/20 shadow-brutal-sm transition" />
+        </div>
+        <div class="flex gap-3 pt-2">
+          <button type="button" onclick="closeEditModal()"
+            class="btn-brutal flex-1 px-4 py-3 bg-saweria-bg border-2 border-saweria-border rounded-xl font-bold text-sm shadow-brutal-sm">
+            Batal
+          </button>
+          <button type="submit" id="editSubmitBtn"
+            class="btn-brutal flex-1 px-4 py-3 bg-saweria-teal border-2 border-saweria-border rounded-xl font-bold text-sm shadow-brutal flex items-center justify-center gap-2 disabled:opacity-50">
+            <span id="editBtnText">Simpan Perubahan</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============ TOAST ============ -->
+  <div id="toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 toast-enter">
+    <div class="flex items-center gap-3 bg-white border-2 border-saweria-border rounded-xl px-5 py-3.5 shadow-brutal font-mono text-sm">
+      <span id="toastIcon"></span>
+      <span id="toastMsg" class="font-bold"></span>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="config.js"></script>
+  <script src="auth.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
