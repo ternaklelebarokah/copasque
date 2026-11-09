@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Background -->
+  <rect width="512" height="512" rx="96" fill="#F5C842"/>
+  <!-- Border -->
+  <rect x="8" y="8" width="496" height="496" rx="90" fill="none" stroke="#111111" stroke-width="16"/>
+  <!-- Bookmark icon -->
+  <path d="M160 120 L160 392 L256 336 L352 392 L352 120 Z"
+        fill="none" stroke="#111111" stroke-width="28" stroke-linejoin="round" stroke-linecap="round"/>
+</svg>
