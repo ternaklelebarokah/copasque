@@ -2,30 +2,33 @@
 
 Web app simpel untuk menyimpan judul & link. Dibuat dengan HTML + Tailwind CSS + Supabase, siap deploy ke Vercel.
 
+## Fitur
+
+- Login autentikasi dengan Supabase Auth
+- Simpan, edit, hapus judul + link ke Supabase
+- Filter berdasarkan kategori
+- Search berdasarkan judul
+- Mode malam (dark mode) dengan toggle
+- Responsive (mobile + desktop)
+- PWA (installable, offline cache)
+- Toast notification
+- Styling brutalist (yellow/teal accent)
+
 ## Setup
 
 ### 1. Buat Project Supabase
 
 - Daftar / login di [supabase.com](https://supabase.com)
 - Buat project baru
-- Buka **SQL Editor** di dashboard dan jalankan query ini:
+- Buka **SQL Editor** di dashboard dan jalankan semua query dari file `supabase.sql`
 
-```sql
-CREATE TABLE links (
-  id          BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  title       TEXT NOT NULL,
-  url         TEXT NOT NULL,
-  created_at  TIMESTAMPTZ DEFAULT now()
-);
-
-ALTER TABLE links ENABLE ROW LEVEL SECURITY;
-
--- Policy untuk akses publik (tanpa login)
-CREATE POLICY "Public read"   ON links FOR SELECT USING (true);
-CREATE POLICY "Public insert" ON links FOR INSERT WITH CHECK (true);
-CREATE POLICY "Public delete" ON links FOR DELETE USING (true);
-CREATE POLICY "Public update" ON links FOR UPDATE USING (true);
-```
+File `supabase.sql` sudah berisi:
+- Pembuatan tabel `links` dengan kolom `user_id`, `title`, `url`, `category`
+- Row Level Security (RLS) berbasis login
+- Policy untuk read, insert, update, delete (hanya user yang login bisa akses data sendiri)
+- Index untuk performa query
+- Pembuatan user admin
+- Data contoh
 
 ### 2. Konfigurasi config.js
 
@@ -62,11 +65,25 @@ vercel
 3. Import repository-nya
 4. Klik **Deploy** — tidak perlu build step, ini static site
 
-## Fitur
+## Struktur File
 
-- Simpan judul + link ke Supabase
-- Hapus link
-- Search / filter berdasarkan judul
-- Responsive (mobile + desktop)
-- Toast notification
-- Styling ala saweria.co (dark theme, violet accent)
+```
+/
+├── index.html       # Halaman utama (daftar link)
+├── login.html       # Halaman login
+├── config.js        # Konfigurasi Supabase
+├── auth.js          # Logic autentikasi
+├── app.js           # Logic aplikasi (CRUD link)
+├── manifest.json    # PWA manifest
+├── sw.js            # Service Worker (offline cache)
+├── vercel.json       # Konfigurasi Vercel
+├── supabase.sql     # SQL setup database
+├── logo-copas.png   # Logo / icon PWA
+└── README.md
+```
+
+## Login
+
+Setelah menjalankan `supabase.sql`, login dengan:
+- Email: `mipela@zuya.store`
+- Password: `@Diana42`

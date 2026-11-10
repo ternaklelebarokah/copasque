@@ -12,8 +12,7 @@ const ASSETS = [
   "/app.js",
   "/auth.js",
   "/config.js",
-  "/icons/icon-192.png",
-  "/icons/icon-512.png",
+  "/logo-copas.png",
   "/manifest.json",
 ];
 

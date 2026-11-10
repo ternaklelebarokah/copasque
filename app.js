@@ -170,8 +170,8 @@ function renderLinks(links) {
             <p class="text-xs text-gray-400 font-mono truncate mt-0.5">${escapeHtml(getDomain(item.url))}</p>
           </div>
         </div>
-        <!-- Action buttons (show on hover) -->
-        <div class="flex items-center gap-1.5 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+        <!-- Action buttons (always visible on mobile, hover on desktop) -->
+        <div class="flex items-center gap-1.5 shrink-0 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
           <button
             onclick="openEditModal(${item.id})"
             class="btn-brutal w-8 h-8 rounded-lg border-2 border-saweria-border bg-saweria-yellow flex items-center justify-center shadow-brutal-sm"

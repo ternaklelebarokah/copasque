@@ -104,6 +104,7 @@ WHERE NOT EXISTS (
 INSERT INTO auth.identities (
   id,
   user_id,
+  provider_id,
   identity_data,
   provider,
   last_sign_in_at,
@@ -113,6 +114,7 @@ INSERT INTO auth.identities (
 SELECT
   gen_random_uuid(),
   u.id,
+  u.id::text,                  -- provider_id = user UUID (untuk email provider)
   json_build_object('sub', u.id::text, 'email', u.email),
   'email',
   now(),

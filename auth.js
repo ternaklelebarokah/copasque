@@ -94,7 +94,7 @@ if (loginForm) {
 // ---- Guard untuk index.html ----
 // Cek session, kalau tidak ada redirect ke login
 async function requireAuth() {
-  if (!supabaseClient) return;
+  if (!supabaseClient) return null;
 
   const { data } = await supabaseClient.auth.getSession();
 

@@ -7,11 +7,12 @@
 
   <!-- PWA -->
   <link rel="manifest" href="/manifest.json" />
+  <link rel="icon" href="/logo-copas.png" type="image/png" />
   <meta name="theme-color" content="#F5C842" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="LinkVault" />
-  <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="/logo-copas.png" />
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -22,6 +23,7 @@
 
   <script>
     tailwind.config = {
+      darkMode: 'class',
       theme: {
         extend: {
           fontFamily: {
@@ -52,6 +54,11 @@
       background-image: radial-gradient(#ddd 1px, transparent 1px);
       background-size: 22px 22px;
     }
+    html.dark body {
+      background-color: #1a1a1a;
+      background-image: radial-gradient(#2e2e2e 1px, transparent 1px);
+      color: #f0f0f0;
+    }
     .btn-brutal {
       transition: transform 0.1s ease, box-shadow 0.1s ease;
     }
@@ -68,7 +75,35 @@
       animation: spin 0.8s linear infinite;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ===== DARK MODE OVERRIDES ===== */
+    html.dark .bg-white { background-color: #242424 !important; }
+    html.dark .bg-saweria-bg { background-color: #2e2e2e !important; }
+    html.dark .border-saweria-border { border-color: #555 !important; }
+    html.dark .shadow-brutal { box-shadow: 4px 4px 0px #555; }
+    html.dark .shadow-brutal-sm { box-shadow: 3px 3px 0px #555; }
+    html.dark .text-saweria-border { color: #f0f0f0; }
+    html.dark .text-gray-400 { color: #888 !important; }
+    html.dark input {
+      background-color: #2e2e2e;
+      border-color: #555;
+      color: #f0f0f0;
+    }
+    html.dark input::placeholder { color: #666; }
+    html.dark .btn-brutal:active { box-shadow: 0px 0px 0px #555 !important; }
+    html.dark #splash { background-color: #1a1a1a !important; }
+    html.dark .splash-dot { background-color: #f0f0f0; }
   </style>
+
+  <script>
+    (function() {
+      if (localStorage.getItem('darkMode') === 'true') {
+        document.documentElement.classList.add('dark');
+        var meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) meta.setAttribute('content', '#1a1a1a');
+      }
+    })();
+  </script>
 </head>
 
 <body class="min-h-screen flex items-center justify-center p-4">
@@ -77,11 +112,7 @@
   <div id="splash" class="fixed inset-0 z-[999] flex flex-col items-center justify-center bg-[#FAFAF8]"
        style="background-image: radial-gradient(#ddd 1px, transparent 1px); background-size: 22px 22px;">
     <!-- Icon -->
-    <div class="w-20 h-20 rounded-2xl border-2 border-[#111] bg-[#F5C842] flex items-center justify-center shadow-[4px_4px_0_#111] mb-5">
-      <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M5 5v14l7-4 7 4V5" />
-      </svg>
-    </div>
+    <img src="/logo-copas.png" alt="LinkVault" class="w-20 h-20 rounded-2xl border-2 border-[#111] shadow-[4px_4px_0_#111] mb-5" />
     <!-- Wordmark -->
     <h1 style="font-family:'Poppins',sans-serif; font-weight:800; font-size:2rem; line-height:1; color:#111; letter-spacing:-0.03em;">
       linkvault
@@ -121,14 +152,26 @@
 
   <div class="w-full max-w-sm">
 
+    <!-- Dark Mode Toggle (top-right fixed) -->
+    <button
+      id="darkModeToggle"
+      onclick="toggleDarkMode()"
+      class="btn-brutal fixed top-4 right-4 z-50 w-9 h-9 flex items-center justify-center bg-white border-2 border-saweria-border rounded-xl shadow-brutal-sm"
+      title="Mode malam"
+      aria-label="Toggle mode malam"
+    >
+      <svg id="iconMoon" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z" />
+      </svg>
+      <svg id="iconSun" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m8.66-9h-1M4.34 12h-1m15.07-6.07-.71.71M6.34 17.66l-.71.71m12.02 0-.71-.71M6.34 6.34l-.71-.71M12 8a4 4 0 100 8 4 4 0 000-8z" />
+      </svg>
+    </button>
+
     <!-- Logo -->
     <div class="text-center mb-8">
       <div class="inline-flex items-center gap-2 mb-4">
-        <div class="w-10 h-10 rounded-xl border-2 border-saweria-border bg-saweria-yellow flex items-center justify-center shadow-brutal">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M5 5v14l7-4 7 4V5" />
-          </svg>
-        </div>
+        <img src="/logo-copas.png" alt="LinkVault" class="w-10 h-10 rounded-xl border-2 border-saweria-border shadow-brutal" />
         <span class="text-2xl font-bold" style="font-family:'Poppins',sans-serif;">linkvault</span>
       </div>
       <p class="text-xs text-gray-400">Masuk untuk mengelola link kamu</p>
@@ -206,6 +249,29 @@
 
   <script src="config.js"></script>
   <script src="auth.js"></script>
+
+  <!-- Dark Mode Toggle -->
+  <script>
+    function toggleDarkMode() {
+      const html = document.documentElement;
+      html.classList.toggle('dark');
+      const isDark = html.classList.contains('dark');
+      localStorage.setItem('darkMode', isDark);
+      updateDarkModeIcon(isDark);
+      // Update theme-color meta for PWA
+      const meta = document.querySelector('meta[name="theme-color"]');
+      if (meta) meta.setAttribute('content', isDark ? '#1a1a1a' : '#F5C842');
+    }
+    function updateDarkModeIcon(isDark) {
+      const iconMoon = document.getElementById('iconMoon');
+      const iconSun  = document.getElementById('iconSun');
+      if (iconMoon && iconSun) {
+        iconMoon.classList.toggle('hidden', isDark);
+        iconSun.classList.toggle('hidden', !isDark);
+      }
+    }
+    updateDarkModeIcon(document.documentElement.classList.contains('dark'));
+  </script>
 
   <!-- PWA Service Worker -->
   <script>

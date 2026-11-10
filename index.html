@@ -8,11 +8,12 @@
 
   <!-- PWA -->
   <link rel="manifest" href="/manifest.json" />
+  <link rel="icon" href="/logo-copas.png" type="image/png" />
   <meta name="theme-color" content="#F5C842" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="LinkVault" />
-  <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="/logo-copas.png" />
 
   <!-- Tailwind CSS via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -27,6 +28,7 @@
 
   <script>
     tailwind.config = {
+      darkMode: 'class',
       theme: {
         extend: {
           fontFamily: {
@@ -59,10 +61,17 @@
     body {
       font-family: 'Space Mono', monospace;
       background-color: #FAFAF8;
-      /* subtle dot pattern like saweria */
       background-image: radial-gradient(#ddd 1px, transparent 1px);
       background-size: 22px 22px;
     }
+    /* Dark mode body */
+    html.dark body {
+      background-color: #1a1a1a;
+      background-image: radial-gradient(#2e2e2e 1px, transparent 1px);
+      color: #f0f0f0;
+    }
+    html.dark .dark\:bg-dark-card { background-color: #242424; }
+
     /* Loading spinner */
     .spinner {
       border: 3px solid rgba(17, 17, 17, 0.1);
@@ -71,6 +80,10 @@
       width: 28px;
       height: 28px;
       animation: spin 0.8s linear infinite;
+    }
+    html.dark .spinner {
+      border-color: rgba(255,255,255,0.1);
+      border-top-color: #3ECFBF;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
     /* Toast */
@@ -111,7 +124,93 @@
       letter-spacing: 0.03em;
       background: #fff;
     }
+    html.dark .tag-pill {
+      border-color: #555;
+      background: #2a2a2a;
+      color: #ddd;
+    }
+
+    /* ===== DARK MODE OVERRIDES ===== */
+    html.dark header,
+    html.dark footer {
+      background-color: #1e1e1e;
+      border-color: #444;
+    }
+    html.dark .bg-saweria-card,
+    html.dark .bg-white {
+      background-color: #242424 !important;
+    }
+    html.dark .bg-saweria-bg {
+      background-color: #2e2e2e !important;
+    }
+    html.dark .border-saweria-border {
+      border-color: #555 !important;
+    }
+    html.dark .shadow-brutal   { box-shadow: 4px 4px 0px #555; }
+    html.dark .shadow-brutal-sm { box-shadow: 3px 3px 0px #555; }
+    html.dark .shadow-brutal-lg { box-shadow: 6px 6px 0px #555; }
+    html.dark .text-saweria-border { color: #f0f0f0; }
+    html.dark .text-gray-400 { color: #888 !important; }
+    html.dark .text-gray-500 { color: #999 !important; }
+    html.dark input,
+    html.dark select {
+      background-color: #2e2e2e;
+      border-color: #555;
+      color: #f0f0f0;
+    }
+    html.dark input::placeholder { color: #666; }
+    html.dark .btn-brutal:active { box-shadow: 0px 0px 0px #555 !important; }
+
+    /* Dark mode: card internal dashed border */
+    html.dark .border-dashed { border-color: #444 !important; }
+    html.dark .border-gray-200 { border-color: #444 !important; }
+    /* Dark mode: toast */
+    html.dark #toast > div {
+      background-color: #242424 !important;
+      border-color: #555 !important;
+    }
+    /* Dark mode: modal */
+    html.dark .modal-content {
+      background-color: #242424 !important;
+      border-color: #555 !important;
+    }
+    /* Dark mode: empty state */
+    html.dark #emptyState > div {
+      background-color: #242424 !important;
+      border-color: #555 !important;
+    }
+    /* Dark mode: select dropdown options */
+    html.dark select option {
+      background-color: #2e2e2e;
+      color: #f0f0f0;
+    }
+    /* Dark mode: link grid card border */
+    html.dark #linkGrid article {
+      border-color: #555 !important;
+      background-color: #242424 !important;
+    }
+    html.dark #linkGrid article .bg-saweria-bg {
+      background-color: #2e2e2e !important;
+      border-color: #555 !important;
+    }
+
+    /* Responsive: smaller hero text on mobile */
+    @media (max-width: 480px) {
+      h1 { font-size: 1.75rem !important; line-height: 1.2 !important; }
+      .hero-subtitle { font-size: 0.75rem; }
+    }
   </style>
+
+  <script>
+    // Apply saved dark mode preference ASAP to avoid flash
+    (function() {
+      if (localStorage.getItem('darkMode') === 'true') {
+        document.documentElement.classList.add('dark');
+        var meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) meta.setAttribute('content', '#1a1a1a');
+      }
+    })();
+  </script>
 </head>
 
 <body class="min-h-screen flex flex-col text-saweria-border">
@@ -122,17 +221,32 @@
 
       <!-- Logo -->
       <a href="#" class="flex items-center gap-2 group">
-        <div class="w-9 h-9 rounded-lg border-2 border-saweria-border bg-saweria-yellow flex items-center justify-center shadow-brutal-sm group-hover:translate-x-[1px] group-hover:translate-y-[1px] group-hover:shadow-none transition-all">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M5 5v14l7-4 7 4V5" />
-          </svg>
-        </div>
+        <img src="/logo-copas.png" alt="LinkVault" class="w-9 h-9 rounded-lg border-2 border-saweria-border shadow-brutal-sm group-hover:translate-x-[1px] group-hover:translate-y-[1px] group-hover:shadow-none transition-all" />
         <span class="text-xl font-display font-800 tracking-tight">linkvault</span>
       </a>
 
       <!-- Right -->
-      <div class="flex items-center gap-3">
-        <span id="userEmail" class="hidden sm:block text-xs text-gray-400 font-mono truncate max-w-[160px]"></span>
+      <div class="flex items-center gap-2 sm:gap-3">
+        <span id="userEmail" class="hidden sm:block text-xs text-gray-400 font-mono truncate max-w-[140px]"></span>
+
+        <!-- Dark Mode Toggle -->
+        <button
+          id="darkModeToggle"
+          onclick="toggleDarkMode()"
+          class="btn-brutal w-9 h-9 flex items-center justify-center bg-white border-2 border-saweria-border rounded-xl shadow-brutal-sm"
+          title="Mode malam"
+          aria-label="Toggle mode malam"
+        >
+          <!-- Moon icon (shown in light mode) -->
+          <svg id="iconMoon" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z" />
+          </svg>
+          <!-- Sun icon (shown in dark mode) -->
+          <svg id="iconSun" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m8.66-9h-1M4.34 12h-1m15.07-6.07-.71.71M6.34 17.66l-.71.71m12.02 0-.71-.71M6.34 6.34l-.71-.71M12 8a4 4 0 100 8 4 4 0 000-8z" />
+          </svg>
+        </button>
+
         <button
           onclick="logout()"
           class="btn-brutal flex items-center gap-1.5 px-3 py-2 bg-white border-2 border-saweria-border rounded-xl text-xs font-bold shadow-brutal-sm"
@@ -141,23 +255,23 @@
           <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
           </svg>
-          Keluar
+          <span class="hidden sm:inline">Keluar</span>
         </button>
       </div>
     </div>
   </header>
 
   <!-- ============ HERO ============ -->
-  <section class="max-w-4xl w-full mx-auto px-4 sm:px-6 pt-12 pb-6 text-center">
+  <section class="max-w-4xl w-full mx-auto px-4 sm:px-6 pt-8 sm:pt-12 pb-6 text-center">
     <p class="text-xs font-mono text-saweria-teal font-bold tracking-widest uppercase mb-3">— simpan semua link kamu —</p>
-    <h1 class="text-4xl sm:text-5xl font-extrabold leading-tight mb-4" style="font-family: 'Poppins', sans-serif;">
+    <h1 class="text-3xl sm:text-5xl font-extrabold leading-tight mb-4" style="font-family: 'Poppins', sans-serif;">
       Tempat nyimpan judul<br />
       <span class="relative inline-block">
         <span class="relative z-10">&amp; link favoritmu!</span>
         <span class="absolute bottom-1 left-0 w-full h-3 bg-saweria-yellow -z-0 opacity-70"></span>
       </span>
     </h1>
-    <p class="text-gray-500 font-mono text-sm max-w-md mx-auto leading-relaxed">
+    <p class="hero-subtitle text-gray-500 font-mono text-sm max-w-md mx-auto leading-relaxed">
       Kumpulkan, edit, dan akses semua link pentingmu dengan rapi. Tersimpan langsung ke Supabase.
     </p>
   </section>
@@ -234,28 +348,28 @@
     <!-- ============ LIST SECTION ============ -->
     <section>
       <!-- Toolbar -->
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-5">
         <div class="flex items-center gap-3">
           <h2 class="text-base font-display font-bold flex items-center gap-2">
             Link Tersimpan
           </h2>
           <span id="countBadge" class="inline-flex items-center justify-center w-7 h-7 rounded-full border-2 border-saweria-border bg-saweria-yellow text-xs font-bold shadow-brutal-sm">0</span>
         </div>
-        <div class="flex items-center gap-2">
+        <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-2">
           <!-- Category Filter -->
           <select
             id="categoryFilter"
-            class="bg-white border-2 border-saweria-border rounded-xl px-3 py-2 text-xs font-bold font-mono focus:border-saweria-teal focus:ring-2 focus:ring-saweria-teal/20 shadow-brutal-sm cursor-pointer transition"
+            class="w-full sm:w-auto bg-white border-2 border-saweria-border rounded-xl px-3 py-2 text-xs font-bold font-mono focus:border-saweria-teal focus:ring-2 focus:ring-saweria-teal/20 shadow-brutal-sm cursor-pointer transition"
           >
             <option value="">Semua Kategori</option>
           </select>
           <!-- Search -->
-          <div class="relative">
+          <div class="relative flex-1 sm:flex-none">
             <input
               type="text"
               id="searchInput"
               placeholder="Cari judul..."
-              class="w-36 sm:w-52 bg-white border-2 border-saweria-border rounded-xl pl-9 pr-4 py-2 text-xs font-mono placeholder-gray-400 focus:border-saweria-teal focus:ring-2 focus:ring-saweria-teal/20 shadow-brutal-sm transition"
+              class="w-full sm:w-52 bg-white border-2 border-saweria-border rounded-xl pl-9 pr-4 py-2 text-xs font-mono placeholder-gray-400 focus:border-saweria-teal focus:ring-2 focus:ring-saweria-teal/20 shadow-brutal-sm transition"
             />
             <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-3 top-2.5 w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -355,6 +469,30 @@
   <script src="config.js"></script>
   <script src="auth.js"></script>
   <script src="app.js"></script>
+
+  <!-- Dark Mode Toggle -->
+  <script>
+    function toggleDarkMode() {
+      const html = document.documentElement;
+      html.classList.toggle('dark');
+      const isDark = html.classList.contains('dark');
+      localStorage.setItem('darkMode', isDark);
+      updateDarkModeIcon(isDark);
+      // Update theme-color meta for PWA
+      const meta = document.querySelector('meta[name="theme-color"]');
+      if (meta) meta.setAttribute('content', isDark ? '#1a1a1a' : '#F5C842');
+    }
+    function updateDarkModeIcon(isDark) {
+      const iconMoon = document.getElementById('iconMoon');
+      const iconSun  = document.getElementById('iconSun');
+      if (iconMoon && iconSun) {
+        iconMoon.classList.toggle('hidden', isDark);
+        iconSun.classList.toggle('hidden', !isDark);
+      }
+    }
+    // Init icon state on load
+    updateDarkModeIcon(document.documentElement.classList.contains('dark'));
+  </script>
 
   <!-- PWA Service Worker -->
   <script>
