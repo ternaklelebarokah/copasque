@@ -195,7 +195,8 @@ function renderLinks(links) {
 
       <!-- URL snippet -->
       <a href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer"
-         class="text-xs font-mono text-saweria-teal hover:underline truncate block">
+         class="text-xs font-mono text-saweria-teal hover:underline block overflow-hidden"
+         style="display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;word-break:break-all;">
         ${escapeHtml(item.url)}
       </a>
 
