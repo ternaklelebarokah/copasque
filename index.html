@@ -63,6 +63,7 @@
       background-color: #FAFAF8;
       background-image: radial-gradient(#ddd 1px, transparent 1px);
       background-size: 22px 22px;
+      overflow-x: hidden; /* prevent horizontal scroll from shadows */
     }
     /* Dark mode body */
     html.dark body {
@@ -199,6 +200,16 @@
       h1 { font-size: 1.75rem !important; line-height: 1.2 !important; }
       .hero-subtitle { font-size: 0.75rem; }
     }
+
+    /* On mobile, reduce brutal shadow so cards don't clip at viewport edge */
+    @media (max-width: 639px) {
+      .shadow-brutal     { box-shadow: 2px 2px 0px #111111 !important; }
+      .shadow-brutal-sm  { box-shadow: 2px 2px 0px #111111 !important; }
+      .shadow-brutal-lg  { box-shadow: 3px 3px 0px #111111 !important; }
+      html.dark .shadow-brutal    { box-shadow: 2px 2px 0px #555 !important; }
+      html.dark .shadow-brutal-sm { box-shadow: 2px 2px 0px #555 !important; }
+      html.dark .shadow-brutal-lg { box-shadow: 3px 3px 0px #555 !important; }
+    }
   </style>
 
   <script>
@@ -277,7 +288,7 @@
   </section>
 
   <!-- ============ MAIN ============ -->
-  <main class="flex-1 max-w-4xl w-full mx-auto px-4 sm:px-6 pb-12">
+  <main class="flex-1 max-w-4xl w-full mx-auto px-4 sm:px-6 pb-12 overflow-x-hidden">
 
     <!-- ============ FORM CARD ============ -->
     <section class="mb-10">

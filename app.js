@@ -151,10 +151,10 @@ function renderLinks(links) {
       : "";
 
     return `
-    <article class="group bg-white border-2 border-saweria-border rounded-2xl p-5 flex flex-col gap-3 shadow-brutal hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all duration-150">
+    <article class="group bg-white border-2 border-saweria-border rounded-2xl p-4 sm:p-5 flex flex-col gap-3 shadow-brutal sm:hover:translate-x-[2px] sm:hover:translate-y-[2px] sm:hover:shadow-none transition-all duration-150">
       <!-- Top row: icon + title + actions -->
-      <div class="flex items-start justify-between gap-3">
-        <div class="flex items-center gap-3 min-w-0">
+      <div class="flex items-start justify-between gap-2">
+        <div class="flex items-center gap-3 min-w-0 flex-1">
           <!-- Favicon -->
           <div class="w-10 h-10 shrink-0 rounded-xl border-2 border-saweria-border bg-saweria-bg flex items-center justify-center overflow-hidden shadow-brutal-sm">
             <img
@@ -165,13 +165,13 @@ function renderLinks(links) {
             />
             <span class="hidden w-full h-full items-center justify-center text-base">🔗</span>
           </div>
-          <div class="min-w-0">
+          <div class="min-w-0 flex-1">
             <h3 class="font-display font-bold text-sm leading-tight truncate" title="${escapeHtml(item.title)}">${escapeHtml(item.title)}</h3>
             <p class="text-xs text-gray-400 font-mono truncate mt-0.5">${escapeHtml(getDomain(item.url))}</p>
           </div>
         </div>
         <!-- Action buttons (always visible on mobile, hover on desktop) -->
-        <div class="flex items-center gap-1.5 shrink-0 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+        <div class="flex items-center gap-1 shrink-0 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
           <button
             onclick="openEditModal(${item.id})"
             class="btn-brutal w-8 h-8 rounded-lg border-2 border-saweria-border bg-saweria-yellow flex items-center justify-center shadow-brutal-sm"
@@ -200,13 +200,13 @@ function renderLinks(links) {
       </a>
 
       <!-- Bottom row: tag + time + open button -->
-      <div class="flex items-center justify-between pt-2 border-t-2 border-dashed border-gray-200">
-        <div class="flex items-center gap-2">
+      <div class="flex items-center justify-between pt-2 border-t-2 border-dashed border-gray-200 gap-2">
+        <div class="flex items-center gap-2 min-w-0 flex-1">
           ${tagHtml}
-          <span class="text-xs font-mono text-gray-400">${timeAgo(item.created_at)}</span>
+          <span class="text-xs font-mono text-gray-400 truncate">${timeAgo(item.created_at)}</span>
         </div>
         <a href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer"
-           class="btn-brutal inline-flex items-center gap-1 px-3 py-1.5 bg-saweria-teal border-2 border-saweria-border rounded-lg text-xs font-bold shadow-brutal-sm">
+           class="btn-brutal shrink-0 inline-flex items-center gap-1 px-3 py-1.5 bg-saweria-teal border-2 border-saweria-border rounded-lg text-xs font-bold shadow-brutal-sm">
           Buka
           <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
