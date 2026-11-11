@@ -99,7 +99,7 @@ async function requireAuth() {
   const { data } = await supabaseClient.auth.getSession();
 
   if (!data.session) {
-    window.location.replace("login.html");
+    window.location.replace("/login");
     return null;
   }
 
@@ -112,7 +112,7 @@ async function logout() {
   if (supabaseClient) {
     await supabaseClient.auth.signOut();
   }
-  window.location.replace("login.html");
+  window.location.replace("/login");
 }
 
 window.logout = logout;
