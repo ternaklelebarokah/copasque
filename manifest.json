@@ -2,7 +2,7 @@
   "name": "LinkVault",
   "short_name": "LinkVault",
   "description": "Simpan dan kelola judul serta link favoritmu.",
-  "start_url": "/login.html",
+  "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",

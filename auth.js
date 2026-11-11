@@ -22,7 +22,7 @@ if (loginForm) {
   if (supabaseClient) {
     supabaseClient.auth.getSession().then(({ data }) => {
       if (data.session) {
-        window.location.replace("index.html");
+        window.location.replace("/");
       }
     });
   }
@@ -59,7 +59,7 @@ if (loginForm) {
       if (error) throw error;
 
       // Sukses — redirect ke halaman utama
-      window.location.replace("index.html");
+      window.location.replace("/");
     } catch (err) {
       const msg = err.message.includes("Invalid login")
         ? "Email atau password salah."
