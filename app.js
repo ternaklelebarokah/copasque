@@ -151,11 +151,11 @@ function renderLinks(links) {
       : "";
 
     return `
-    <article class="group bg-white border-2 border-saweria-border rounded-2xl p-4 flex flex-col gap-2.5 shadow-brutal sm:hover:translate-x-[2px] sm:hover:translate-y-[2px] sm:hover:shadow-none transition-all duration-150">
+    <article class="group bg-white border-2 border-saweria-border rounded-2xl p-4 flex flex-col gap-3 shadow-brutal sm:hover:translate-x-[2px] sm:hover:translate-y-[2px] sm:hover:shadow-none transition-all duration-150">
 
-      <!-- Top row: favicon + title + domain -->
+      <!-- Top: favicon + judul + domain -->
       <div class="flex items-center gap-3 min-w-0">
-        <div class="w-9 h-9 shrink-0 rounded-xl border-2 border-saweria-border bg-saweria-bg flex items-center justify-center overflow-hidden shadow-brutal-sm">
+        <div class="w-10 h-10 shrink-0 rounded-xl border-2 border-saweria-border bg-saweria-bg flex items-center justify-center overflow-hidden shadow-brutal-sm">
           <img
             src="https://www.google.com/s2/favicons?domain=${escapeHtml(getDomain(item.url))}&sz=32"
             alt=""
@@ -165,21 +165,33 @@ function renderLinks(links) {
           <span class="hidden w-full h-full items-center justify-center text-sm">🔗</span>
         </div>
         <div class="min-w-0 flex-1">
-          <h3 class="font-display font-bold text-sm leading-tight truncate" title="${escapeHtml(item.title)}">${escapeHtml(item.title)}</h3>
+          <h3 class="font-display font-bold text-sm leading-snug truncate" title="${escapeHtml(item.title)}">${escapeHtml(item.title)}</h3>
           <p class="text-xs text-gray-400 font-mono truncate">${escapeHtml(getDomain(item.url))}</p>
         </div>
       </div>
 
-      <!-- URL — truncated to one line -->
-      <p class="text-xs font-mono text-saweria-teal truncate">${escapeHtml(item.url)}</p>
+      <!-- Bottom: tag + waktu | copy + edit + hapus + buka -->
+      <div class="flex items-center justify-between border-t-2 border-dashed border-gray-200 pt-2.5 gap-2">
 
-      <!-- Bottom row: tag + time | edit + delete + buka -->
-      <div class="flex items-center justify-between pt-2 border-t-2 border-dashed border-gray-200 gap-2">
+        <!-- kiri: tag & waktu -->
         <div class="flex items-center gap-2 min-w-0 flex-1 overflow-hidden">
           ${tagHtml}
-          <span class="text-xs font-mono text-gray-400 truncate shrink-0">${timeAgo(item.created_at)}</span>
+          <span class="text-xs font-mono text-gray-400 truncate">${timeAgo(item.created_at)}</span>
         </div>
+
+        <!-- kanan: tombol aksi -->
         <div class="flex items-center gap-1 shrink-0">
+          <!-- Copy -->
+          <button
+            onclick="copyLink('${escapeHtml(item.url)}')"
+            class="btn-brutal w-7 h-7 rounded-lg border-2 border-saweria-border bg-white flex items-center justify-center shadow-brutal-sm"
+            title="Salin link"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-4 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+            </svg>
+          </button>
+          <!-- Edit -->
           <button
             onclick="openEditModal(${item.id})"
             class="btn-brutal w-7 h-7 rounded-lg border-2 border-saweria-border bg-saweria-yellow flex items-center justify-center shadow-brutal-sm"
@@ -189,6 +201,7 @@ function renderLinks(links) {
               <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
             </svg>
           </button>
+          <!-- Hapus -->
           <button
             onclick="deleteLink(${item.id})"
             class="btn-brutal w-7 h-7 rounded-lg border-2 border-saweria-border bg-saweria-red text-white flex items-center justify-center shadow-brutal-sm"
@@ -198,8 +211,9 @@ function renderLinks(links) {
               <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
             </svg>
           </button>
+          <!-- Buka -->
           <a href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer"
-             class="btn-brutal inline-flex items-center gap-1 px-2.5 py-1.5 bg-saweria-teal border-2 border-saweria-border rounded-lg text-xs font-bold shadow-brutal-sm">
+             class="btn-brutal inline-flex items-center gap-1 px-2.5 h-7 bg-saweria-teal border-2 border-saweria-border rounded-lg text-xs font-bold shadow-brutal-sm">
             Buka
             <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
               <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
@@ -404,11 +418,33 @@ searchInput.addEventListener("input", applyFilters);
 categoryFilter.addEventListener("change", applyFilters);
 
 // ============================================================
+//  Copy Link
+// ============================================================
+async function copyLink(url) {
+  try {
+    await navigator.clipboard.writeText(url);
+    showToast("Link disalin! 📋", "success");
+  } catch {
+    // fallback untuk browser/device yang tidak support clipboard API
+    const el = document.createElement("textarea");
+    el.value = url;
+    el.style.position = "fixed";
+    el.style.opacity = "0";
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand("copy");
+    document.body.removeChild(el);
+    showToast("Link disalin! 📋", "success");
+  }
+}
+
+// ============================================================
 //  Expose globals for inline onclick
 // ============================================================
-window.deleteLink    = deleteLink;
-window.openEditModal = openEditModal;
-window.closeEditModal= closeEditModal;
+window.deleteLink     = deleteLink;
+window.openEditModal  = openEditModal;
+window.closeEditModal = closeEditModal;
+window.copyLink       = copyLink;
 
 // ============================================================
 //  Init — cek auth dulu, baru load data
