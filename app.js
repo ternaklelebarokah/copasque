@@ -151,69 +151,63 @@ function renderLinks(links) {
       : "";
 
     return `
-    <article class="group bg-white border-2 border-saweria-border rounded-2xl p-4 sm:p-5 flex flex-col gap-3 shadow-brutal sm:hover:translate-x-[2px] sm:hover:translate-y-[2px] sm:hover:shadow-none transition-all duration-150">
-      <!-- Top row: icon + title + actions -->
-      <div class="flex items-start justify-between gap-2">
-        <div class="flex items-center gap-3 min-w-0 flex-1">
-          <!-- Favicon -->
-          <div class="w-10 h-10 shrink-0 rounded-xl border-2 border-saweria-border bg-saweria-bg flex items-center justify-center overflow-hidden shadow-brutal-sm">
-            <img
-              src="https://www.google.com/s2/favicons?domain=${escapeHtml(getDomain(item.url))}&sz=32"
-              alt=""
-              class="w-5 h-5"
-              onerror="this.style.display='none';this.nextSibling.style.display='flex'"
-            />
-            <span class="hidden w-full h-full items-center justify-center text-base">🔗</span>
-          </div>
-          <div class="min-w-0 flex-1">
-            <h3 class="font-display font-bold text-sm leading-tight truncate" title="${escapeHtml(item.title)}">${escapeHtml(item.title)}</h3>
-            <p class="text-xs text-gray-400 font-mono truncate mt-0.5">${escapeHtml(getDomain(item.url))}</p>
-          </div>
+    <article class="group bg-white border-2 border-saweria-border rounded-2xl p-4 flex flex-col gap-2.5 shadow-brutal sm:hover:translate-x-[2px] sm:hover:translate-y-[2px] sm:hover:shadow-none transition-all duration-150">
+
+      <!-- Top row: favicon + title + domain -->
+      <div class="flex items-center gap-3 min-w-0">
+        <div class="w-9 h-9 shrink-0 rounded-xl border-2 border-saweria-border bg-saweria-bg flex items-center justify-center overflow-hidden shadow-brutal-sm">
+          <img
+            src="https://www.google.com/s2/favicons?domain=${escapeHtml(getDomain(item.url))}&sz=32"
+            alt=""
+            class="w-5 h-5"
+            onerror="this.style.display='none';this.nextSibling.style.display='flex'"
+          />
+          <span class="hidden w-full h-full items-center justify-center text-sm">🔗</span>
         </div>
-        <!-- Action buttons (always visible on mobile, hover on desktop) -->
-        <div class="flex items-center gap-1 shrink-0 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+        <div class="min-w-0 flex-1">
+          <h3 class="font-display font-bold text-sm leading-tight truncate" title="${escapeHtml(item.title)}">${escapeHtml(item.title)}</h3>
+          <p class="text-xs text-gray-400 font-mono truncate">${escapeHtml(getDomain(item.url))}</p>
+        </div>
+      </div>
+
+      <!-- URL — truncated to one line -->
+      <p class="text-xs font-mono text-saweria-teal truncate">${escapeHtml(item.url)}</p>
+
+      <!-- Bottom row: tag + time | edit + delete + buka -->
+      <div class="flex items-center justify-between pt-2 border-t-2 border-dashed border-gray-200 gap-2">
+        <div class="flex items-center gap-2 min-w-0 flex-1 overflow-hidden">
+          ${tagHtml}
+          <span class="text-xs font-mono text-gray-400 truncate shrink-0">${timeAgo(item.created_at)}</span>
+        </div>
+        <div class="flex items-center gap-1 shrink-0">
           <button
             onclick="openEditModal(${item.id})"
-            class="btn-brutal w-8 h-8 rounded-lg border-2 border-saweria-border bg-saweria-yellow flex items-center justify-center shadow-brutal-sm"
+            class="btn-brutal w-7 h-7 rounded-lg border-2 border-saweria-border bg-saweria-yellow flex items-center justify-center shadow-brutal-sm"
             title="Edit"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
               <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
             </svg>
           </button>
           <button
             onclick="deleteLink(${item.id})"
-            class="btn-brutal w-8 h-8 rounded-lg border-2 border-saweria-border bg-saweria-red text-white flex items-center justify-center shadow-brutal-sm"
+            class="btn-brutal w-7 h-7 rounded-lg border-2 border-saweria-border bg-saweria-red text-white flex items-center justify-center shadow-brutal-sm"
             title="Hapus"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
               <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
             </svg>
           </button>
+          <a href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer"
+             class="btn-brutal inline-flex items-center gap-1 px-2.5 py-1.5 bg-saweria-teal border-2 border-saweria-border rounded-lg text-xs font-bold shadow-brutal-sm">
+            Buka
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </a>
         </div>
       </div>
 
-      <!-- URL snippet -->
-      <a href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer"
-         class="text-xs font-mono text-saweria-teal hover:underline block overflow-hidden"
-         style="display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;word-break:break-all;">
-        ${escapeHtml(item.url)}
-      </a>
-
-      <!-- Bottom row: tag + time + open button -->
-      <div class="flex items-center justify-between pt-2 border-t-2 border-dashed border-gray-200 gap-2">
-        <div class="flex items-center gap-2 min-w-0 flex-1">
-          ${tagHtml}
-          <span class="text-xs font-mono text-gray-400 truncate">${timeAgo(item.created_at)}</span>
-        </div>
-        <a href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer"
-           class="btn-brutal shrink-0 inline-flex items-center gap-1 px-3 py-1.5 bg-saweria-teal border-2 border-saweria-border rounded-lg text-xs font-bold shadow-brutal-sm">
-          Buka
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-          </svg>
-        </a>
-      </div>
     </article>
   `}).join("");
 }
