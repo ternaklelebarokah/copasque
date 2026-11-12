@@ -150,28 +150,55 @@ function renderLinks(links) {
       ? `<span class="tag-pill" style="background:${tagColor.bg};border-color:${tagColor.border};">${escapeHtml(item.category)}</span>`
       : "";
 
-    return `
-    <article class="group bg-white border-2 border-saweria-border rounded-2xl p-4 flex flex-col gap-3 shadow-brutal sm:hover:translate-x-[2px] sm:hover:translate-y-[2px] sm:hover:shadow-none transition-all duration-150">
+    const isUsed = !!item.is_used;
 
-      <!-- Top: favicon + judul + domain -->
+    // Card style berubah kalau sudah dipakai
+    const cardClass = isUsed
+      ? "group bg-gray-50 border-2 border-gray-300 rounded-2xl p-4 flex flex-col gap-3 shadow-[2px_2px_0px_#aaa] opacity-70 transition-all duration-150"
+      : "group bg-white border-2 border-saweria-border rounded-2xl p-4 flex flex-col gap-3 shadow-brutal sm:hover:translate-x-[2px] sm:hover:translate-y-[2px] sm:hover:shadow-none transition-all duration-150";
+
+    const titleClass = isUsed
+      ? "font-display font-bold text-sm leading-snug truncate line-through text-gray-400"
+      : "font-display font-bold text-sm leading-snug truncate";
+
+    const usedBadge = isUsed
+      ? `<span class="inline-flex items-center gap-1 text-xs font-bold font-mono text-green-600 bg-green-50 border border-green-300 rounded-full px-2 py-0.5 shrink-0">
+           <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+             <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+           </svg>
+           Dipakai
+         </span>`
+      : "";
+
+    const checkBtnClass = isUsed
+      ? "btn-brutal w-7 h-7 rounded-lg border-2 border-green-400 bg-green-100 text-green-600 flex items-center justify-center shadow-brutal-sm"
+      : "btn-brutal w-7 h-7 rounded-lg border-2 border-saweria-border bg-white flex items-center justify-center shadow-brutal-sm";
+
+    return `
+    <article class="${cardClass}">
+
+      <!-- Top: favicon + judul + domain + badge -->
       <div class="flex items-center gap-3 min-w-0">
-        <div class="w-10 h-10 shrink-0 rounded-xl border-2 border-saweria-border bg-saweria-bg flex items-center justify-center overflow-hidden shadow-brutal-sm">
+        <div class="w-10 h-10 shrink-0 rounded-xl border-2 ${isUsed ? 'border-gray-300' : 'border-saweria-border'} bg-saweria-bg flex items-center justify-center overflow-hidden ${isUsed ? 'shadow-[2px_2px_0px_#aaa]' : 'shadow-brutal-sm'}">
           <img
             src="https://www.google.com/s2/favicons?domain=${escapeHtml(getDomain(item.url))}&sz=32"
             alt=""
-            class="w-5 h-5"
+            class="w-5 h-5 ${isUsed ? 'grayscale opacity-50' : ''}"
             onerror="this.style.display='none';this.nextSibling.style.display='flex'"
           />
           <span class="hidden w-full h-full items-center justify-center text-sm">🔗</span>
         </div>
         <div class="min-w-0 flex-1">
-          <h3 class="font-display font-bold text-sm leading-snug truncate" title="${escapeHtml(item.title)}">${escapeHtml(item.title)}</h3>
+          <div class="flex items-center gap-2 flex-wrap">
+            <h3 class="${titleClass}" title="${escapeHtml(item.title)}">${escapeHtml(item.title)}</h3>
+            ${usedBadge}
+          </div>
           <p class="text-xs text-gray-400 font-mono truncate">${escapeHtml(getDomain(item.url))}</p>
         </div>
       </div>
 
-      <!-- Bottom: tag + waktu | copy + edit + hapus + buka -->
-      <div class="flex items-center justify-between border-t-2 border-dashed border-gray-200 pt-2.5 gap-2">
+      <!-- Bottom: tag + waktu | centang + copy + edit + hapus + buka -->
+      <div class="flex items-center justify-between border-t-2 border-dashed ${isUsed ? 'border-gray-200' : 'border-gray-200'} pt-2.5 gap-2">
 
         <!-- kiri: tag & waktu -->
         <div class="flex items-center gap-2 min-w-0 flex-1 overflow-hidden">
@@ -181,6 +208,16 @@ function renderLinks(links) {
 
         <!-- kanan: tombol aksi -->
         <div class="flex items-center gap-1 shrink-0">
+          <!-- Centang / Sudah dipakai -->
+          <button
+            onclick="toggleUsed(${item.id})"
+            class="${checkBtnClass}"
+            title="${isUsed ? 'Tandai belum dipakai' : 'Tandai sudah dipakai'}"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+            </svg>
+          </button>
           <!-- Copy -->
           <button
             onclick="copyLink('${escapeHtml(item.url)}')"
@@ -418,6 +455,33 @@ searchInput.addEventListener("input", applyFilters);
 categoryFilter.addEventListener("change", applyFilters);
 
 // ============================================================
+//  Toggle Used Status
+// ============================================================
+async function toggleUsed(id) {
+  const item = allLinks.find(l => l.id === id);
+  if (!item) return;
+
+  const newVal = !item.is_used;
+  try {
+    const { data, error } = await supabaseClient
+      .from("links")
+      .update({ is_used: newVal })
+      .eq("id", id)
+      .select()
+      .single();
+    if (error) throw error;
+
+    const idx = allLinks.findIndex(l => l.id === id);
+    if (idx !== -1) allLinks[idx] = data;
+
+    applyFilters();
+    showToast(newVal ? "Ditandai sudah dipakai ✅" : "Ditandai belum dipakai", "info");
+  } catch (err) {
+    showToast("Gagal update status: " + err.message, "error");
+  }
+}
+
+// ============================================================
 //  Copy Link
 // ============================================================
 async function copyLink(url) {
@@ -445,6 +509,7 @@ window.deleteLink     = deleteLink;
 window.openEditModal  = openEditModal;
 window.closeEditModal = closeEditModal;
 window.copyLink       = copyLink;
+window.toggleUsed     = toggleUsed;
 
 // ============================================================
 //  Init — cek auth dulu, baru load data

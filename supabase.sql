@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS links (
   title       TEXT        NOT NULL,
   url         TEXT        NOT NULL,
   category    TEXT        NOT NULL DEFAULT '',
+  is_used     BOOLEAN     NOT NULL DEFAULT false,
   created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
@@ -63,6 +64,13 @@ CREATE POLICY "User delete own links"
 CREATE INDEX IF NOT EXISTS links_user_id_idx    ON links (user_id);
 CREATE INDEX IF NOT EXISTS links_created_at_idx ON links (created_at DESC);
 CREATE INDEX IF NOT EXISTS links_category_idx   ON links (category);
+
+
+-- ------------------------------------------------------------
+--  STEP 4b — Kolom is_used (tambahan fitur "sudah dipakai")
+--  Jalankan ini kalau tabel sudah ada sebelumnya
+-- ------------------------------------------------------------
+ALTER TABLE links ADD COLUMN IF NOT EXISTS is_used BOOLEAN NOT NULL DEFAULT false;
 
 
 -- ------------------------------------------------------------
